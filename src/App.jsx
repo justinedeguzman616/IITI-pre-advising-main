@@ -1,0 +1,279 @@
+import "./App.css";
+import React, { Suspense, lazy } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import Login from "./login/login.jsx";
+import Nav from "./navbar/nav.jsx";
+
+import YearLevel from "./yearLevel/yearLevel.jsx";
+import Section from "./yearLevel/section/section.jsx";
+import List from "./yearLevel/list/list.jsx";
+import ViewGrade from "./yearLevel/viewGrade/viewGrade.jsx";
+
+import PreAdvising from "./pre-advising/pre-Advising.jsx";
+import PreAdvisingList from "./pre-advising/pre-Advising list.jsx";
+import PreAdvisingSections from "./pre-advising/sections.jsx";
+import PreAdvisingStudent from "./pre-advising/pre-AdvisingStudent.jsx";
+
+import Schedule from "./schedule/schedule.jsx";
+import ViewSection from "./schedule/viewSection.jsx";
+import ViewSchedule from "./schedule/viewSchedule.jsx";
+import Settings from "./settings/settings.jsx";
+
+import Profile from "./settings/profile.jsx";
+
+import PreAdvisingFirstSem from "./pre-advising/pre-AdvisingFirstSem.jsx";
+import PreAdvisingSecondSem from "./pre-advising/pre-AdvisingSecondSem.jsx";
+import PreAdvisingSubjects from "./pre-advising/pre-AdvisingSubjects.jsx";
+
+import SubjectListing from "./subjectListing/subjectListing.jsx";
+import SubjectStudents from "./subjectListing/subjectStudents.jsx";
+
+
+// Lazy loaded dashboard
+const Dashboard = lazy(() => import("./dashboard/dashboard.jsx"));
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 40, color: '#666' }}>
+          Something went wrong loading this page. Please go back and try again.
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
+
+        {/* Dashboard */}
+        <Route
+          path="/dashboard"
+          element={
+            <Suspense fallback={null}>
+              <Nav />
+              <Dashboard />
+            </Suspense>
+          }
+        />
+
+        {/* Year Level */}
+        <Route
+          path="/year-level"
+          element={
+            <>
+              <Nav />
+              <YearLevel />
+            </>
+          }
+        />
+
+        {/* Pre-Advising */}
+        <Route
+          path="/pre-advising"
+          element={
+            <>
+              <Nav />
+              <PreAdvising />
+            </>
+          }
+        />
+
+        {/* This path opens the List */}
+        <Route
+          path="/pre-advising-list"
+          element={
+            <>
+              <Nav />
+              <PreAdvisingList />
+            </>
+          }
+        />
+
+          {/* Pre-Advising Sections (shows sections for selected year) */}
+          <Route
+            path="/pre-advising-sections"
+            element={
+              <>
+                <Nav />
+                <PreAdvisingSections />
+              </>
+            }
+          />
+
+          <Route
+            path="/pre-advising-student"
+            element={
+              <>
+                <Nav />
+                <PreAdvisingStudent />
+              </>
+            }
+          />
+
+       {/* Pre Advising First Sem */}
+        <Route
+          path="/pre-advising-1st-sem"
+          element={
+            <>
+              <Nav />
+              <PreAdvisingFirstSem />
+            </>
+          }
+        />
+
+         {/* Pre Advising second Sem */}
+        <Route
+          path="/pre-advising-2nd-sem"
+          element={
+            <>
+              <Nav />
+              <PreAdvisingSecondSem />
+            </>
+          }
+        />
+
+        {/* Pre-Advising: student subject list (Remove / Change Subject / Change Schedule) */}
+        <Route
+          path="/pre-advising-subjects"
+          element={
+            <>
+              <Nav />
+              <PreAdvisingSubjects />
+            </>
+          }
+        />
+
+        {/* Schedule */}
+        <Route
+          path="/schedule"
+          element={
+            <>
+              <Nav />
+              <Schedule />
+            </>
+          }
+        />
+
+        {/* Subject Listing */}
+        <Route
+          path="/subject-listing"
+          element={
+            <>
+              <Nav />
+              <SubjectListing />
+            </>
+          }
+        />
+
+        {/* Subject Listing: students enrolled in a subject */}
+        <Route
+          path="/subject-listing-students"
+          element={
+            <>
+              <Nav />
+              <SubjectStudents />
+            </>
+          }
+        />
+
+        {/* Settings */}
+        <Route
+          path="/settings"
+          element={
+            <>
+              <Nav />
+              <Settings />
+            </>
+          }
+        />
+
+        {/* Profile */}
+        <Route
+          path="/profile"
+          element={
+            <>
+              <Nav />
+              <Profile />
+            </>
+          }
+        />
+
+        {/* Section */}
+        <Route
+          path="/section"
+          element={
+            <>
+              <Nav />
+              <Section />
+            </>
+          }
+        />
+
+        {/* List */}
+        <Route
+          path="/list"
+          element={
+            <>
+              <Nav />
+              <List />
+            </>
+          }
+        />
+       {/* View Grade */}
+        <Route
+          path="/viewGrade"
+          element={
+            <>
+              <Nav />
+              <ErrorBoundary>
+                <ViewGrade />
+              </ErrorBoundary>
+            </>
+          }
+        />
+       {/* View Section */}
+        <Route
+          path="/viewSection"
+          element={
+            <>
+              <Nav />
+              <ViewSection />
+            </>
+          }
+        />
+       {/* View schedule */}
+        <Route
+          path="/viewSchedule"
+          element={
+            <>
+              <Nav />
+              <ViewSchedule />
+            </>
+          }
+        />
+
+
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
