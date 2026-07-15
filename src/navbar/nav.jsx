@@ -36,10 +36,23 @@ function Nav() {
     "/dashboard": "dashboard",
     "/year-level": "yearlevel",
     "/pre-advising": "pre-advising",
+    "/pre-advising-list": "pre-advising",
+    "/pre-advising-sections": "pre-advising",
+    "/pre-advising-student": "pre-advising",
+    "/pre-advising-1st-sem": "pre-advising",
+    "/pre-advising-2nd-sem": "pre-advising",
+    "/pre-advising-subjects": "pre-advising",
     "/schedule": "schedule",
+    "/viewSchedule": "schedule",
+    "/viewSection": "schedule",
     "/subject-listing": "subjectlisting",
     "/subject-listing-students": "subjectlisting",
-    "/settings": "setting"
+    "/settings": "setting",
+    "/profile": "setting",
+    "/year-level": "yearlevel",
+    "/section": "yearlevel",
+    "/list": "yearlevel",
+    "/viewGrade": "yearlevel"
   };
 
   const active = pathToKey[location.pathname] || "dashboard";
