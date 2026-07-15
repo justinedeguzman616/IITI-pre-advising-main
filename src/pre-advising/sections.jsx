@@ -138,7 +138,7 @@ const PreAdvisingSections = () => {
           <div className="flex items-center gap-3">
             <span className="font-bold text-black/50">Pre-Advising</span>
             <img src={next} alt="Next" className="w-4 h-4" />
-            <span className="font-bold text-black/50">{yearTitle === 'BSIT 1st Year' ? '1st Year' : yearTitle}</span>
+            <span className="font-bold text-black">{yearTitle === 'BSIT 1st Year' ? '1st Year' : yearTitle}</span>
           </div>
         </div>
 

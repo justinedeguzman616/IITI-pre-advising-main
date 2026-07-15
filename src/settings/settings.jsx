@@ -1,54 +1,92 @@
-import React, { useState, useEffect } from "react";
-import adminLogo from "../../src/dashboard/dashboardLOGO/adminLogo.png";
-import { Link, useNavigate } from "react-router-dom";
-import ExitModal from "./ExitModal";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from 'react-router-dom'
+import ExitModal from './ExitModal'
 
-export default function EditProfile() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
+const EditProfile = () => {
+  // State for each input field
+  const [fullName, setFullName] = useState("Admin Dela Cruz");
+  const [username, setUsername] = useState("Admin");
+  const [gsuite, setGsuite] = useState("999999999999");
+  const [position, setPosition] = useState("Admin");
 
-  const [fullName, setFullName] = useState('')
-  const [username, setUsername] = useState('')
-  const [gsuite, setGsuite] = useState('')
-  const [position, setPosition] = useState('')
+  // State to toggle readonly/editable
+  const [editFields, setEditFields] = useState({
+    fullName: false,
+    username: false,
+    gsuite: false,
+    position: false,
+  });
+
+  // Toggle edit mode for a field
+  const toggleEdit = (field) => {
+    setEditFields((prev) => ({ ...prev, [field]: !prev[field] }));
+  };
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}')
-    setFullName(user.full_name || '')
-    setUsername(user.username || '')
-    setGsuite(user.gsuite || '')
-    setPosition(user.position || '')
+    fetch('/bridge/profile')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          const p = data.data || {}
+          setFullName(p.full_name ?? p.fullName ?? p.name ?? fullName)
+          setUsername(p.username ?? username)
+          setGsuite(p.gsuite ?? gsuite)
+          setPosition(p.position ?? position)
+        }
+      })
+      .catch(() => {})
   }, [])
 
-  const handleLogout = () => {
-    // Perform logout logic here
-    navigate("/login"); // redirect to login page
-  };
+  const handleFileUpload = async (e) => {
+    const file = e.target.files && e.target.files[0]
+    if (!file) return
+
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const res = await fetch('/bridge/profile/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      const data = await res.json()
+      if (data.success) {
+        alert('Profile picture updated!')
+      } else {
+        alert('Upload failed: ' + (data.error || 'Unknown error'))
+      }
+    } catch (err) {
+      alert('Upload failed: ' + err.message)
+    } finally {
+      // clear the input value so same file can be uploaded again if needed
+      if (e.target) e.target.value = ''
+    }
+  }
+
+  const navigate = useNavigate()
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const performLogout = () => {
+    try {
+      localStorage.removeItem('user')
+    } catch (e) {
+      // ignore
+    }
+    navigate('/login')
+  }
 
   return (
     <div className="h-full pl-[55%] md:pl-88 font-RB w-full bg-[#F5F5F5] min-h-screen">
-
       {/* HEADER */}
       <div className="bg-white shadow px-6 py-4 flex items-center justify-between border-b-[5px] border-[#D9D9D9]">
-        <span className="text-[1.5625rem] font-bold text-black">Settings</span>
-
-        <Link to="/profile">
-          <div className="flex-col cursor-pointer active:scale-95">
-            <img src={adminLogo} alt="admin" className="h-10.5 w-10.5" />
-            <h1 className="text-xs text-center">Admin</h1>
-          </div>
-        </Link>
-      </div>
-
-      <div className="px-10 mt-6">
-        <h2 className="text-[1.25rem] font-normal text-black">Account Details</h2>
+        <span className="text-[1.5625rem] font-bold text-black">Profile</span>
       </div>
 
       {/* PROFILE CONTENT */}
       <div className="px-10 py-10">
-
         {/* Profile Info */}
-          <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-6">
           <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -62,45 +100,118 @@ export default function EditProfile() {
           <h2 className="text-[1.25rem] font-bold text-black">{fullName}</h2>
         </div>
 
-        {/* Form */}
-        <div className="space-y-6">
-          {[
-            { label: "Full Name", value: fullName },
-            { label: "Username", value: username },
-            { label: "Gsuite", value: gsuite },
-            { label: "Position", value: position },
-          ].map((field) => (
-            <div key={field.label}>
-              <label className="text-[0.75rem] text-gray-500">{field.label}</label>
-              <div className="mt-2 w-127 h-14.5 bg-white border border-gray-300 rounded-[20px] flex items-center px-5">
-                <input
-                  type="text"
-                  value={field.value}
-                  readOnly
-                  className="w-full bg-transparent outline-none text-[0.875rem] text-gray-700"
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* LOGOUT BUTTON */}
-        <div className="mt-10">
+        {/* Buttons */}
+        <div className="flex gap-3 mb-10">
+          <input
+            type="file"
+            id="profilePicInput"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleFileUpload}
+          />
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-red-500 text-white text-sm px-5 py-2 rounded-full hover:bg-red-600 transition-colors"
+            onClick={() => document.getElementById('profilePicInput').click()}
+            className="bg-green-700 text-white text-sm px-5 py-2 rounded-full"
           >
-            Logout
+            Upload New
+          </button>
+          <button className="bg-gray-200 text-gray-400 text-sm px-5 py-2 rounded-full cursor-not-allowed">
+            Remove Profile Picture
           </button>
         </div>
-      </div>
 
-      {/* EXIT MODAL */}
-      <ExitModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={handleLogout}
-      />
+        {/* removed earlier logout placement; button will appear under Position */}
+
+        {/* Title */}
+        <h3 className="text-[1.25rem] font-bold mb-6 text-black">Edit Profile</h3>
+
+        {/* Form */}
+        <div className="space-y-6">
+          {/* Full Name */}
+          <EditableField
+            label="Full Name"
+            value={fullName}
+            setValue={setFullName}
+            editable={editFields.fullName}
+            toggleEdit={() => toggleEdit("fullName")}
+          />
+          {/* Username */}
+          <EditableField
+            label="Username"
+            value={username}
+            setValue={setUsername}
+            editable={editFields.username}
+            toggleEdit={() => toggleEdit("username")}
+          />
+          {/* Gsuite */}
+          <EditableField
+            label="Gsuite"
+            value={gsuite}
+            setValue={setGsuite}
+            editable={editFields.gsuite}
+            toggleEdit={() => toggleEdit("gsuite")}
+          />
+          {/* Position */}
+          <EditableField
+            label="Position"
+            value={position}
+            setValue={setPosition}
+            editable={editFields.position}
+            toggleEdit={() => toggleEdit("position")}
+          />
+          <div className="mt-10">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-red-500 text-white text-sm px-5 py-2 rounded-full hover:bg-red-600 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+
+          <ExitModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onConfirm={() => {
+              setIsModalOpen(false)
+              performLogout()
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
+};
+
+// Reusable Editable Field Component
+const EditableField = ({ label, value, setValue, editable, toggleEdit }) => {
+  const inputRef = useRef(null)
+
+  const handleContainerClick = () => {
+    if (!editable) {
+      toggleEdit()
+      setTimeout(() => inputRef.current?.focus(), 0)
+    }
+  }
+
+  return (
+    <div>
+      <label className="text-[0.75rem] text-gray-500">{label}</label>
+      <div
+        className="mt-2 w-full max-w-127 min-h-14.5 bg-white border border-gray-300 rounded-[20px] flex items-center px-5 cursor-text"
+        onClick={handleContainerClick}
+      >
+        <input
+          ref={inputRef}
+          type="text"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          className="w-full bg-transparent outline-none text-[0.875rem] text-gray-700"
+          readOnly={!editable}
+          onClick={(e) => e.stopPropagation()}
+        />
+      </div>
+    </div>
+  )
 }
+
+export default EditProfile;
