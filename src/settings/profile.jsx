@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from 'react-router-dom'
+import ExitModal from './ExitModal'
 
 const EditProfile = () => {
   // State for each input field
@@ -61,6 +63,19 @@ const EditProfile = () => {
     }
   }
 
+  const navigate = useNavigate()
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const performLogout = () => {
+    try {
+      localStorage.removeItem('user')
+    } catch (e) {
+      // ignore
+    }
+    navigate('/login')
+  }
+
   return (
     <div className="h-full pl-[55%] md:pl-88 font-RB w-full bg-[#F5F5F5] min-h-screen">
       {/* HEADER */}
@@ -105,6 +120,8 @@ const EditProfile = () => {
           </button>
         </div>
 
+        {/* removed earlier logout placement; button will appear under Position */}
+
         {/* Title */}
         <h3 className="text-[1.25rem] font-bold mb-6 text-black">Edit Profile</h3>
 
@@ -142,6 +159,23 @@ const EditProfile = () => {
             editable={editFields.position}
             toggleEdit={() => toggleEdit("position")}
           />
+          <div className="mt-10">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-red-500 text-white text-sm px-5 py-2 rounded-full hover:bg-red-600 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+
+          <ExitModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onConfirm={() => {
+              setIsModalOpen(false)
+              performLogout()
+            }}
+          />
         </div>
       </div>
     </div>
@@ -149,34 +183,35 @@ const EditProfile = () => {
 };
 
 // Reusable Editable Field Component
-const EditableField = ({ label, value, setValue, editable, toggleEdit }) => (
-  <div>
-    <label className="text-[0.75rem] text-gray-500">{label}</label>
-    <div className="mt-2 w-127 h-14.5 bg-white border border-gray-300 rounded-[20px] flex items-center justify-between px-5">
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        className="w-full bg-transparent outline-none text-[0.875rem] text-gray-700"
-        readOnly={!editable}
-      />
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className={`w-6 h-6 ml-3 cursor-pointer ${
-          editable ? "text-green-500" : "text-gray-400"
-        }`}
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        onClick={toggleEdit}
+const EditableField = ({ label, value, setValue, editable, toggleEdit }) => {
+  const inputRef = useRef(null)
+
+  const handleContainerClick = () => {
+    if (!editable) {
+      toggleEdit()
+      setTimeout(() => inputRef.current?.focus(), 0)
+    }
+  }
+
+  return (
+    <div>
+      <label className="text-[0.75rem] text-gray-500">{label}</label>
+      <div
+        className="mt-2 w-full max-w-127 min-h-14.5 bg-white border border-gray-300 rounded-[20px] flex items-center px-5 cursor-text"
+        onClick={handleContainerClick}
       >
-        <path
-          strokeWidth={2}
-          d="M15.232 5.232l3.536 3.536M9 13l6.232-6.232a2.5 2.5 0 113.536 3.536L12.536 16.536H9V13z"
+        <input
+          ref={inputRef}
+          type="text"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          className="w-full bg-transparent outline-none text-[0.875rem] text-gray-700"
+          readOnly={!editable}
+          onClick={(e) => e.stopPropagation()}
         />
-      </svg>
+      </div>
     </div>
-  </div>
-);
+  )
+}
 
 export default EditProfile;

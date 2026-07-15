@@ -299,8 +299,8 @@ function Dashboard() {
               </div>
 
               {/* Table */}
-              <div className="mx-auto w-full overflow-x-auto rounded-md max-h-[360px] overflow-y-auto">
-                <div className="w-full border border-[#D9D9D9]/50 rounded-md overflow-hidden shadow-sm min-w-[640px]">
+              <div className="mx-auto w-full overflow-x-auto rounded-md max-h-90 overflow-y-auto">
+                <div className="w-full border border-[#D9D9D9]/50 rounded-md overflow-hidden shadow-sm min-w-160">
                   <div className="grid grid-cols-[1fr_2fr_0.8fr_0.7fr] bg-[#1C6100] text-white text-sm min-w-0">
                     <span className="px-2 py-2 border-r border-white/30 text-left">Student Number</span>
                     <span className="px-2 py-2 border-r border-white/30 text-left">Name</span>
@@ -398,8 +398,8 @@ function Dashboard() {
 
               {/* Subject Table */}
               <div className="border border-[#D9D9D9]/50 rounded-md overflow-hidden relative">
-                <div ref={subjectTableRef} className="overflow-x-auto overflow-y-auto max-h-[320px] relative">
-                  <div className="min-w-[420px] relative">
+                <div ref={subjectTableRef} className="overflow-x-auto overflow-y-auto max-h-80 relative">
+                  <div className="min-w-105 relative">
                     {/* Subject Table Header */}
                     <div className="grid grid-cols-[70px_1fr_50px_110px] bg-[#1C6100] text-white text-sm text-center">
                       <span className="px-2 py-2 border-r border-white/30">Code</span>
